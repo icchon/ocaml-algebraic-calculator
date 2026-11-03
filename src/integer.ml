@@ -42,26 +42,26 @@ let succ (x: t): t =
 
 (* n乗根 *)
 let rec root (n : int) (x : t) : t option =
-    if n < 0 then None
-    else if equal x zero then Some zero
-    else if compare x zero < 0 then
-      if n mod 2 = 0 then None
-      else
-        match root n (neg x) with
-        | Some k -> Some (neg k)
-        | None -> None
+  if n < 0 then None
+  else if equal x zero then Some zero
+  else if compare x zero < 0 then
+    if n mod 2 = 0 then None
     else
-      let rec search low high =
-        if compare low high > 0 then None
-        else
-          let mid = div_rem (add low high) 2 |> fst in
-          let mid_pow = pow n mid in
-          let cmp = compare mid_pow x in
-          if cmp = 0 then Some mid
-          else if cmp < 0 then search (add mid one) high
-          else search low (sub mid one)
-      in
-      search one x
+      match root n (neg x) with
+      | Some k -> Some (neg k)
+      | None -> None
+  else
+    let rec search low high =
+      if compare low high > 0 then None
+      else
+        let mid = div_rem (add low high) 2 |> fst in
+        let mid_pow = pow n mid in
+        let cmp = compare mid_pow x in
+        if cmp = 0 then Some mid
+        else if cmp < 0 then search (add mid one) high
+        else search low (sub mid one)
+    in
+    search one x
 
 (* ここから先は3次方程式の章で追加 *)
 

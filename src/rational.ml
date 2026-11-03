@@ -32,9 +32,7 @@ let extract_square_factor (m : Integer.t) : Integer.t * Integer.t =
   aux (Integer.succ Integer.one) m Integer.one
 
 (* 平方根が有理数として開けるか判定する。開ければその値を、開けなければ
-   無平方な分子（下の体で添加する基底そのもの）と、その平方根の係数を返す。
-   sqrt(n/d) = sqrt(n*d)/d = s*sqrt(r)/d （n*d = r * s^2、rは無平方）という
-   変形にもとづく *)
+   無平方数（下の体で添加する基底そのもの）と、その平方根の係数を返す *)
 let try_sqrt (q : t) : (t, Integer.t * t) result =
   match root 2 q with
   | Some r -> Ok r
