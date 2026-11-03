@@ -28,3 +28,12 @@ and atom (s : string) : string =
 module Q_rootp_expr = Expr.Q_rootp.Make (Q_rootp)
 
 let q_rootp fmt x = Format.pp_print_string fmt (text (Q_rootp_expr.to_expr x))
+
+(* 定数の体の元（a + bi）と、有理関数体 K(x) の元。中身の組 (1, 0) のままだと、
+   有理数の分子と分母（1/0）と見分けがつかないので、式の形で表示する *)
+module Quadratic_expr = Expr.Quadratic.Make (Q_rootp)
+module Rational_function_expr =
+  Expr.Make_tower_expr (Rational_function) (Quadratic_expr) (struct let var = Expr.atom "x" end)
+
+let constant fmt x = Format.pp_print_string fmt (text (Quadratic_expr.to_expr x))
+let rational_function fmt x = Format.pp_print_string fmt (text (Rational_function_expr.to_expr x))

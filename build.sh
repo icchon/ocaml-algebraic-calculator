@@ -10,5 +10,7 @@ for f in $ORDER; do ocamlc -c "$f"; done
 {
   for f in $ORDER; do echo "#load \"_build/${f%.ml}.cmo\";;"; done
   echo "#install_printer Printers.q_rootp;;"
+  echo "#install_printer Printers.constant;;"
+  echo "#install_printer Printers.rational_function;;"
 } > load.ml
 echo "完了しました。このフォルダで ocaml を起動してください。"
