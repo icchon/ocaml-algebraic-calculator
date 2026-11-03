@@ -1,0 +1,4 @@
+(* このフォルダで ocaml を起動すると、本書のモジュールがすべて読み込まれる。
+   先に ./build.sh を実行しておくこと。 *)
+#directory "_build";;
+#use "_build/load.ml";;
