@@ -63,12 +63,9 @@ let rec root (n : int) (x : t) : t option =
       in
       search one x
 
-(* ここから先は微分・積分の章で追加 *)
+(* ここから先は3次方程式の章で追加 *)
 
 (* 絶対値 *)
 let abs (x: t): t =
   if compare x zero >= 0 then x
   else neg x
-
-(* 微分 *)
-let differentiate (_: t): t = zero

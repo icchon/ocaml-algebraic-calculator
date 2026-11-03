@@ -34,9 +34,8 @@ cd ocaml-algebraic-calculator
 $ ocaml
 # Rational.add (1, 2) (1, 3);;
 - : Rational.t = (5, 6)
-# Elementary.integrate_log [Rational.zero; Rational.zero; Rational.one] (1, 1);;
-- : Elementary.t =
--(1/9) x^3 - (1/6) x^2 - (1/3) x + ((1/3) x^3 - 1/3) log(x - 1)
+# Quadratic.solve (1, 1) (0, 1) (-2, 1);;
+- : Quadratic.t * Quadratic.t = ((√2, 0), (-√2, 0))
 ```
 
 答えは、プログラムの中での表現のまま表示されます（有理数の `(5, 6)` は 5/6 のことです）。
@@ -47,7 +46,7 @@ $ ocaml
 | フォルダ | 中身 |
 |---|---|
 | `src/` | 本書でつくるモジュール（整数・有理数・複素数・多項式・拡大体・二次方程式・微分積分など）。本文のコードの完成形 |
-| `show/` | 中身が見えない型（`Q_rootp.t`・`Elementary.t` など）の答えを、対話環境で読める形にするためのコード。本文には出てきません |
+| `show/` | 中身が見えない型（`Q_rootp.t`）の答えを、対話環境で読める形にするためのコード。本文には出てきません |
 
 ## ライセンス
 

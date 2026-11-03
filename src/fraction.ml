@@ -4,13 +4,11 @@ module type Ring = sig
   val compare: t -> t -> int
   val gcd: t -> t -> t
   val div_rem: t -> t -> t * t
-  val differentiate: t -> t (* 微分・積分の章で追加 *)
 end
 
 module type FUNCTOR_TYPE = functor (R: Ring) ->
   (sig
      include Field.S
-     val differentiate: t -> t (* 微分・積分の章で追加 *)
      val compare: t -> t -> int
    end with type t = R.t * R.t)
 
@@ -71,12 +69,4 @@ module Make: FUNCTOR_TYPE = functor (R: Ring) -> struct
     type nonrec t = t
     let one, mul, inv = one, mul, inv
   end)
-
-  (* ここから先は微分・積分の章で追加 *)
-
-  (* 微分 *)
-  let differentiate ((n, d): t): t =
-    let n' = R.differentiate n in
-    let d' = R.differentiate d in
-    (R.sub (R.mul n' d) (R.mul n d'), R.mul d d) |> normalize
 end

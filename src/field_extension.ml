@@ -1,14 +1,12 @@
 
 module type IrreduciblePoly = sig
-  module C : Polynomial.Coeff (* 微分・積分の章でField.Sから差し替え *)
+  module C : Field.S
   module P : Polynomial.S with type coeff = C.t
   val poly : P.t
 end
 
-(* 出力側もField.SからPolynomial.Coeffへ、微分・積分の章で差し替え *)
 module type FUNCTOR_TYPE =
-  functor (I: IrreduciblePoly) ->
-    (Polynomial.Coeff with type t = I.P.t)
+  functor (I: IrreduciblePoly) -> (Field.S with type t = I.P.t)
 
 module Make: FUNCTOR_TYPE = functor (I: IrreduciblePoly) -> struct
   include I.P
@@ -50,10 +48,4 @@ module Make: FUNCTOR_TYPE = functor (I: IrreduciblePoly) -> struct
     type nonrec t = t
     let one, mul, inv = one, mul, inv
   end)
-
-  (* ここから先は微分・積分の章で追加 *)
-
-  (* 微分 *)
-  let differentiate (p: t): t =
-    List.map I.C.differentiate p
 end

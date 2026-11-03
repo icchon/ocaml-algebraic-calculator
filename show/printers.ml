@@ -1,5 +1,5 @@
 (* 対話環境で答えを読める形にする。.ocamlinit が #install_printer で登録する。
-   中身が見えない型（Q_rootp.t・Elementary.t など）だけを対象にする。
+   中身が見えない型（Q_rootp.t）だけを対象にする。
    有理数の (5, 6) のような組は、そのまま表示される。 *)
 let rec text ?(p = 0) (e : Expr.t) : string =
   let wrap q s = if q < p then "(" ^ s ^ ")" else s in
@@ -26,7 +26,5 @@ and atom (s : string) : string =
   else s
 
 module Q_rootp_expr = Expr.Q_rootp.Make (Q_rootp)
-module Elementary_expr = Expr.Elementary.Make (Q_rootp) (Quadratic) (Quadratic_poly) (Elementary)
 
 let q_rootp fmt x = Format.pp_print_string fmt (text (Q_rootp_expr.to_expr x))
-let elementary fmt x = Format.pp_print_string fmt (text (Elementary_expr.to_expr x))

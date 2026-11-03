@@ -92,9 +92,6 @@ let neg (v : t) : t =
    とどまるので、共役をとっても自分自身のまま） *)
 let conj (x: t): t = x
 
-(* 微分 *)
-let differentiate (_: t): t = zero
-
 include Add_group.Extend(struct
   type nonrec t = t
   let add, neg = add, neg

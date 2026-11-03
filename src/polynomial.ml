@@ -1,10 +1,4 @@
 
-(* Coeffは微分・積分の章で追加した、係数側にdifferentiateを要求する制約 *)
-module type Coeff = sig
-  include Field.S
-  val differentiate: t -> t
-end
-
 module type S = sig
   type coeff
   type t = coeff list
@@ -25,13 +19,11 @@ module type S = sig
   val leading_coeff: t -> coeff
   val div_scalar: coeff -> t -> t
   val mul_scalar: coeff -> t -> t
-  val differentiate: t -> t (* 微分・積分の章で追加 *)
 end
 
-(* 引数の制約がField.SからCoeffへ、微分・積分の章で差し替え *)
-module type FUNCTOR_TYPE = functor (C: Coeff) -> (S with type coeff = C.t)
+module type FUNCTOR_TYPE = functor (C: Field.S) -> (S with type coeff = C.t)
 
-module Make: FUNCTOR_TYPE = functor (C: Coeff) -> struct
+module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
   type t = C.t list
   type coeff = C.t
   let zero: t = []
@@ -149,20 +141,4 @@ module Make: FUNCTOR_TYPE = functor (C: Coeff) -> struct
       val mul_scalar: C.t -> t -> t
       val div_scalar: C.t -> t -> t
     end with type t := t)
-
-  (* ここから先は微分・積分の章で追加 *)
-
-  (* 整数から係数への変換 *)
-  let rec int_to_coeff (n: int): C.t =
-    if n <= 0 then C.zero else C.add C.one (int_to_coeff (n - 1))
-
-  (* 微分 *)
-  let differentiate (p: t): t =
-    let coeff_deriv = List.map C.differentiate p in
-    let power_deriv =
-      match p with
-      | [] -> []
-      | _ :: rest -> List.mapi (fun i c -> C.mul c (int_to_coeff (i + 1))) rest
-    in
-    add coeff_deriv power_deriv
 end
