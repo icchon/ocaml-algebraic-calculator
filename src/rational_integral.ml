@@ -61,23 +61,24 @@ let integrate ((p, q): F.t): A.t Integral.result =
     (List.fold_left (fun acc (a, m) -> A.add acc (root_term r q a m))
        (A.of_field (F.of_poly (integrate_poly s))) (roots_of q))
 
-(* y' + a y = g の有理関数解y。aは0でない多項式に限る（θ = e^u のuが多項式のとき）。
-   g = n/b のとき、yの分母は gcd(b, b') で割り切れる形に決まるので、
-   y = z/d（d = gcd(b, b')）とおくと、多項式zについての方程式
-   d z' + (a d - d') z = g d^2 になる。zは最高次の係数から順に決まる *)
+(* y' + a y = g の有理関数解y（aは0でない多項式）。
+   y = z/d（d = gcd(b, b')）とおき、d z' + (a d - d') z = g d^2 を解く *)
 let solve_rde (a: F.t) (g: F.t): F.t option =
-  if P.degree (snd a) > 0 then failwith "Rational_integral.solve_rde: u' must be a polynomial";
+  if P.degree (snd a) > 0 then
+    failwith "Rational_integral.solve_rde: u' must be a polynomial";
   let a = fst a in
   let d = P.gcd (snd g) (P.differentiate (snd g)) in
   let ad = P.mul a d in
   let lhs (z: P.t): P.t =
-    P.add (P.mul d (P.differentiate z)) (P.mul (P.sub ad (P.differentiate d)) z) in
+    P.add (P.mul d (P.differentiate z))
+      (P.mul (P.sub ad (P.differentiate d)) z) in
   let (c, c_den) = F.mul g (F.of_poly (P.mul d d)) in
-  (* 残りrの、zのk次の係数で決まる項を順に消していく。最後に残りが0でなければ解はない *)
+  (* zの係数を最高次から決めて、残りrを消していく。残りが0でなければ解はない *)
   let rec back (r: P.t) (k: int) (z: P.t): P.t option =
     if k < 0 then (if P.equal r P.zero then Some z else None)
     else
-      let term = monomial (Constant.div (coeff r (k + P.degree ad)) (P.leading_coeff ad)) k in
+      let c = Constant.div (coeff r (k + P.degree ad)) (P.leading_coeff ad) in
+      let term = monomial c k in
       back (P.sub r (lhs term)) (k - 1) (P.add z term)
   in
   if P.degree c_den > 0 then None (* 右辺が多項式でなければ解はない *)
