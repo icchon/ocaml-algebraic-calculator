@@ -62,24 +62,30 @@ end)
 let of_rational (q : Coeff.t) : t =
   normalize [([], q)]
 
-(* 無平方数を、素因数のリスト（小さい順）に分解する *)
-let prime_factors (n : Integer.t) : basis =
-  let rec aux d remaining =
-    if Integer.compare (Integer.mul d d) remaining > 0 then [remaining]
+(* 正の整数mを s^2 * (相異なる素数の積) に分け、sと素数のリスト（小さい順）を返す *)
+let split_square (m : Integer.t) : Integer.t * basis =
+  let two = Integer.add Integer.one Integer.one in
+  let rec aux p m s primes =
+    if Integer.compare (Integer.mul p p) m > 0 then
+      if Integer.equal m Integer.one then (s, List.rev primes)
+      else (s, List.rev (m :: primes))
     else
-      let (q, r) = Integer.div_rem remaining d in
-      if Integer.equal r Integer.zero then d :: aux (Integer.succ d) q
-      else aux (Integer.succ d) remaining
+      let (q2, r2) = Integer.div_rem m (Integer.mul p p) in
+      let (q1, r1) = Integer.div_rem m p in
+      let next = Integer.add p Integer.one in
+      if Integer.equal r2 Integer.zero then aux p q2 (Integer.mul s p) primes
+      else if Integer.equal r1 Integer.zero then aux next q1 s (p :: primes)
+      else aux next m s primes
   in
-  aux (Integer.succ Integer.one) n
+  aux two m Integer.one []
 
-(** 平方根 *)
+(* 有理数の平方根（qは0以上）。√(n/d) = √(nd)/d = (s/d)√(素数の積) *)
 let of_rational_sqrt (q : Coeff.t) : t =
   if Coeff.equal q Coeff.zero then zero
   else
-    match Rational.try_sqrt q with
-    | Ok r -> of_rational r
-    | Error (square_free, coeff) -> [(prime_factors square_free, coeff)]
+    let (n, d) = q in
+    let (s, primes) = split_square (Integer.mul n d) in
+    normalize [(primes, Coeff.div (Coeff.of_integer s) (Coeff.of_integer d))]
 
 (* 大小比較（自然な順序ではなく、符号の正規化のための便宜的な全順序） *)
 let compare (x1 : t) (x2 : t) : int =
