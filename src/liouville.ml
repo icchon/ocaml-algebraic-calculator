@@ -1,5 +1,5 @@
 (* 初等関数で書ける積分の答えの形（リウヴィルの定理）: 体Fの元vと、
-   定数c_i、Fの元w_iを使って v + Σ c_i log w_i と書ける *)
+   定数c_i、Fの元w_iを使って v + c1 log w1 + c2 log w2 + ... と書ける *)
 
 module type S = sig
   type field
@@ -9,7 +9,7 @@ module type S = sig
   val of_field: field -> t
   val log: constant -> field -> t
   val add: t -> t -> t
-  val differentiate: t -> field (* v' + Σ c_i w_i'/w_i *)
+  val differentiate: t -> field (* v' + c1 w1'/w1 + c2 w2'/w2 + ... *)
 end
 
 module type FUNCTOR_TYPE = functor (F: Differential.S) ->

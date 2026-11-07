@@ -11,7 +11,7 @@ let solve_first_order (a: Rational_function.t) (g: Rational_function.t)
   : Rational_function.t option =
   Rational_integral.solve_rde a g
 
-(* 有理関数体に e^(rx) を添加した微分体の元 Σ c_i (e^(rx))^i を、
+(* 有理関数体に e^(rx) を添加した微分体の元 c0 + c1 e^(rx) + c2 (e^(rx))^2 + ... を、
    係数のリストで表す。rごとに別の微分体になる *)
 type t = { rate: Constant.t; coeffs: Rational_function.t list }
 

@@ -1,6 +1,6 @@
 (* Kで積分でき、Kでリッシュの微分方程式が解ければ、θ = e^u を添加した
    K(θ) でも積分できるかどうかが決まる。被積分関数はθの多項式
-   Σ p_i θ^i（p_i ∈ K）に限る *)
+   p0 + p1 θ + p2 θ^2 + ...（p_i ∈ K）に限る *)
 module type FUNCTOR_TYPE =
   functor (I: Integral.S) (E: Tower.ELEMENTARY with module K = I.F) ->
     (Integral.S with module F = E)
