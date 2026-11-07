@@ -4,8 +4,8 @@
 
 let linear (r: Rational.t): Q_poly.t = [Rational.neg r; Rational.one]
 
-(* 2次の因数を探す（クロネッカーの方法）。整数係数の因数 a x^2 + b x + c の
-   0, 1, -1 での値は、pの値の約数になるので、約数の組をすべて試す *)
+(* 2次の因数を探す（クロネッカーの方法）。c, s, t は g(0), g(1), g(-1) の候補。
+   a = (s + t)/2 - c、b = (s - t)/2 から g を決めて、割り切れるものを探す *)
 let quadratic_factor (p: Q_poly.t): Q_poly.t option =
   let (ints, _, _) = Q_poly.to_integer_poly p in
   let p = List.map Rational.of_integer ints in
@@ -33,7 +33,8 @@ let rec all_roots (p: Q_poly.t): Constant.t list =
     let (x1, x2) = Quadratic.solve a b c in [x1; x2]
   | p ->
     match Q_poly.solve_equation p with
-    | r :: _ -> Constant.of_rational r :: all_roots (fst (Q_poly.div_rem p (linear r)))
+    | r :: _ ->
+      Constant.of_rational r :: all_roots (fst (Q_poly.div_rem p (linear r)))
     | [] ->
       match quadratic_factor p with
       | Some g -> all_roots g @ all_roots (fst (Q_poly.div_rem p g))
