@@ -87,7 +87,7 @@ let of_rational_sqrt (q : Coeff.t) : t =
     let (s, primes) = split_square (Integer.mul n d) in
     normalize [(primes, Coeff.div (Coeff.of_integer s) (Coeff.of_integer d))]
 
-(* 大小比較（自然な順序ではなく、符号の正規化のための便宜的な全順序） *)
+(* 大小比較 *)
 let compare (x1 : t) (x2 : t) : int =
   List.compare (fun (s1, c1) (s2, c2) ->
     let o = compare_basis s1 s2 in
