@@ -50,7 +50,7 @@ module Make: FUNCTOR_TYPE = functor (D: DERIVATIVE) -> struct
       match normalize (gcd a b), normalize b with
       | [], _ | _, [] -> gcd a b
       | g, b -> mul_scalar (K.div (leading_coeff b) (leading_coeff g)) g
-    (* 大小比較 *)
+    (* 全順序 *)
     let rec compare (x1: t) (x2: t): int =
       match x1, x2 with
       | [], [] -> 0

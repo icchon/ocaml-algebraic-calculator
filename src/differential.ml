@@ -3,7 +3,7 @@
 module type S = sig
   include Field.S                (* 体の演算 *)
   type constant                  (* 定数の体の型 *)
-  val compare: t -> t -> int     (* 元を並べる順序 *)
+  val compare: t -> t -> int     (* 全順序 *)
   val differentiate: t -> t      (* 微分 *)
   val of_constant: constant -> t (* 定数をこの体の元にする *)
 end
