@@ -18,8 +18,8 @@ module Make: FUNCTOR_TYPE =
     List.fold_left (fun acc (c, w) -> A.add acc (A.log c (E.of_base w)))
       (A.of_field (E.of_base b.v)) b.logs
 
-  (* p_i θ^i（i ≥ 1）の積分は y θ^i の形で、
-     (y θ^i)' = (y' + i u' y) θ^i なので、y' + i u' y = p_i を解く。
+  (* p_k θ^k（k ≥ 1）の積分は y θ^k の形で、
+     (y θ^k)' = (y' + k u' y) θ^k なので、y' + k u' y = p_k を解く。
      解がなければ初等関数では書けない *)
   let integrate (f: E.t): A.t Integral.result =
     match E.to_poly f with

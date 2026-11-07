@@ -32,7 +32,7 @@ module Make: FUNCTOR_TYPE = functor (D: DERIVATIVE) -> struct
   module K = D.K
   module P = struct
     include Polynomial.Make(K)
-    (* 整数をKの元として埋め込む *)
+    (* 整数を1つ下の体の元として埋め込む *)
     let rec of_int (n: int): K.t =
       if n <= 0 then K.zero else K.add K.one (of_int (n - 1))
     (* θについてのべき乗則: c0 + c1 θ + c2 θ^2 + ... から

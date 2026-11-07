@@ -48,7 +48,7 @@ module Make: FUNCTOR_TYPE = functor (R: Ring) -> struct
     else
       (d, n) |> normalize
 
-  (* 大小比較 *)
+  (* 全順序 *)
   let compare ((n1, d1): t) ((n2, d2): t): int =
     R.compare (R.mul n1 d2) (R.mul n2 d1)
   (* 等価判定 *)
