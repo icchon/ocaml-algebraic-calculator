@@ -10,7 +10,7 @@ module Make: FUNCTOR_TYPE =
   module A = Liouville.Make(L)
 
   (* 整数をKの元として埋め込む *)
-  let rec of_int (n: int): I.F.t = if n = 0 then I.F.zero else I.F.add I.F.one (of_int (n - 1))
+  let rec of_integer (n: int): I.F.t = if n = 0 then I.F.zero else I.F.add I.F.one (of_integer (n - 1))
 
   (* Kでの答えを K(θ) へ持ち上げる。c log u は c θ にまとめる *)
   let lift (b: I.A.t): A.t =
@@ -40,7 +40,7 @@ module Make: FUNCTOR_TYPE =
       | Integral.Elementary b ->
         let n = L.P.degree p in
         let (s, c) = split b in
-        let top = List.init n (fun _ -> I.F.zero) @ [s; I.F.div c (of_int (n + 1))] in
+        let top = List.init n (fun _ -> I.F.zero) @ [s; I.F.div c (of_integer (n + 1))] in
         Integral.map (A.add (A.of_field (L.of_poly top)))
           (integrate_poly (L.P.sub p (L.P.differentiate top)))
 

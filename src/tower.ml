@@ -33,14 +33,14 @@ module Make: FUNCTOR_TYPE = functor (D: DERIVATIVE) -> struct
   module P = struct
     include Polynomial.Make(K)
     (* 整数を1つ下の体の元として埋め込む *)
-    let rec of_int (n: int): K.t =
-      if n <= 0 then K.zero else K.add K.one (of_int (n - 1))
+    let rec of_integer (n: int): K.t =
+      if n <= 0 then K.zero else K.add K.one (of_integer (n - 1))
     (* θについてのべき乗則: c0 + c1 θ + c2 θ^2 + ... から
        c1 + 2 c2 θ + 3 c3 θ^2 + ... をつくる *)
     let power_rule (p: t): t =
       match p with
       | [] -> []
-      | _ :: rest -> List.mapi (fun i c -> K.mul c (of_int (i + 1))) rest
+      | _ :: rest -> List.mapi (fun i c -> K.mul c (of_integer (i + 1))) rest
     (* 微分: (c0 + c1 θ + ...)' =
          (c0' + c1' θ + ...) + (c1 + 2 c2 θ + ...) θ' *)
     let differentiate (p: t): t =
@@ -100,15 +100,15 @@ module type ARGUMENT = sig
   val argument: K.t
 end
 
-(* 変数x: x' = 1。定数の体の上に、log/expと同じファンクタで作る *)
-module Variable (K: Differential.S): S with module K = K =
+(* 変数x: x' = 1。定数の体の上に、log/expと同じファンクタでつくる *)
+module Variable(K: Differential.S): S with module K = K =
   Make(struct
     module K = K
     let derivative: K.t list = [K.one]
   end)
 
 (* θ = log u: θ' = u'/u *)
-module Log (A: ARGUMENT): ELEMENTARY with module K = A.K = struct
+module Log(A: ARGUMENT): ELEMENTARY with module K = A.K = struct
   include Make(struct
     module K = A.K
     let derivative: K.t list = [K.div (K.differentiate A.argument) A.argument]
@@ -117,7 +117,7 @@ module Log (A: ARGUMENT): ELEMENTARY with module K = A.K = struct
 end
 
 (* θ = e^u: θ' = u'θ *)
-module Exp (A: ARGUMENT): ELEMENTARY with module K = A.K = struct
+module Exp(A: ARGUMENT): ELEMENTARY with module K = A.K = struct
   include Make(struct
     module K = A.K
     let derivative: K.t list = [K.zero; K.differentiate A.argument]

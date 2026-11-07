@@ -2,7 +2,7 @@
 module type IrreduciblePoly = sig
   module C : Field.S
   module P : Polynomial.S with type coeff = C.t
-  val poly : P.t
+  val poly: P.t
 end
 
 module type FUNCTOR_TYPE =
@@ -23,23 +23,23 @@ module Make: FUNCTOR_TYPE = functor (I: IrreduciblePoly) -> struct
   let neg (x: t): t =
     neg x |> normalize
   (* 乗法 *)
-  let mul (x: t) (y: t): t   =
+  let mul (x: t) (y: t): t =
     mul x y |> normalize
   (* 逆元 *)
   let inv (x: t): t =
     let x_norm = normalize x in
     if equal x_norm I.P.zero then
-      failwith "Division by zero in extension field"
+      failwith "Division by zero"
     else
       let (g, u, _) = ext_gcd x_norm I.poly in
       let lc = I.P.leading_coeff g in
-      let u_monic = div_scalar lc u in
-      normalize u_monic
+      let x_inv = div_scalar lc u in
+      normalize x_inv
 
   include Add_group.Extend(struct
-      type nonrec t = t
-      let add, neg = add, neg
-    end)
+    type nonrec t = t
+    let add, neg = add, neg
+  end)
   include Mul_monoid.Extend(struct
     type nonrec t = t
     let one, mul = one, mul

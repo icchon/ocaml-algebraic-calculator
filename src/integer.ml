@@ -20,14 +20,17 @@ let div_rem (x1: t) (x2: t): t * t =
 (* 大小比較 *)
 let compare (x1: t) (x2: t): int =
   x1 - x2
+(* 絶対値 *)
+let abs (x: t): t =
+  if compare x zero >= 0 then x else neg x
 
-include Mul_monoid.Extend(struct
-  type nonrec t = t
-  let one, mul = one, mul
-end)
 include Add_group.Extend(struct
   type nonrec t = t
   let add, neg = add, neg
+end)
+include Mul_monoid.Extend(struct
+  type nonrec t = t
+  let one, mul = one, mul
 end)
 include Euclidean.Extend(struct
   type nonrec t = t
@@ -41,7 +44,7 @@ let succ (x: t): t =
   add x one
 
 (* n乗根 *)
-let rec root (n : int) (x : t) : t option =
+let rec root (n: int) (x: t): t option =
   if n < 0 then None
   else if equal x zero then Some zero
   else if compare x zero < 0 then
@@ -63,9 +66,3 @@ let rec root (n : int) (x : t) : t option =
     in
     search one x
 
-(* ここから先は3次方程式の章で追加 *)
-
-(* 絶対値 *)
-let abs (x: t): t =
-  if compare x zero >= 0 then x
-  else neg x

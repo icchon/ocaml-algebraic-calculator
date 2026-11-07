@@ -9,19 +9,27 @@ let linear (r: Rational.t): Q_poly.t = [Rational.neg r; Rational.one]
 let quadratic_factor (p: Q_poly.t): Q_poly.t option =
   let (ints, _, _) = Q_poly.to_integer_poly p in
   let p = List.map Rational.of_integer ints in
-  let value (x: int): int = fst (Q_poly.eval p (Rational.of_integer x)) in
+  let value (x: Integer.t): Integer.t =
+    fst (Q_poly.eval p (Rational.of_integer x)) in
+  let two = Integer.add Integer.one Integer.one in
+  let half (n: Integer.t): Integer.t * Integer.t = Integer.div_rem n two in
+  let make (c: Integer.t) (s: Integer.t) (t: Integer.t): Q_poly.t option =
+    let (a, r) = half (Integer.sub (Integer.add s t) (Integer.mul two c)) in
+    if Integer.equal a Integer.zero
+       || not (Integer.equal r Integer.zero) then None
+    else
+      Some (List.map Rational.of_integer [c; fst (half (Integer.sub s t)); a])
+  in
+  let divisors (x: Integer.t) = Q_poly.divisors (value x) in
   let candidates =
     List.concat_map (fun c ->
       List.concat_map (fun s ->
-        List.filter_map (fun t ->
-          let a2 = s + t - 2 * c in
-          if a2 = 0 || a2 mod 2 <> 0 then None
-          else Some (List.map Rational.of_integer [c; (s - t) / 2; a2 / 2]))
-          (Q_poly.divisors (value (-1))))
-        (Q_poly.divisors (value 1)))
-      (Q_poly.divisors (value 0))
+        List.filter_map (make c s) (divisors (Integer.neg Integer.one)))
+        (divisors Integer.one))
+      (divisors Integer.zero)
   in
-  List.find_opt (fun g -> Q_poly.equal (snd (Q_poly.div_rem p g)) Q_poly.zero) candidates
+  List.find_opt
+    (fun g -> Q_poly.equal (snd (Q_poly.div_rem p g)) Q_poly.zero) candidates
 
 exception Irreducible
 

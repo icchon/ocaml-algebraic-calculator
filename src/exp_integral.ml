@@ -11,15 +11,14 @@ module Make: FUNCTOR_TYPE =
   module A = Liouville.Make(E)
 
   (* 整数をKの元として埋め込む *)
-  let rec of_int (n: int): I.F.t = if n = 0 then I.F.zero else I.F.add I.F.one (of_int (n - 1))
+  let rec of_integer (n: int): I.F.t = if n = 0 then I.F.zero else I.F.add I.F.one (of_integer (n - 1))
 
   (* Kでの答えを K(θ) へ持ち上げる *)
   let lift (b: I.A.t): A.t =
     List.fold_left (fun acc (c, w) -> A.add acc (A.log c (E.of_base w)))
       (A.of_field (E.of_base b.v)) b.logs
 
-  (* p_k θ^k（k ≥ 1）の積分は y θ^k の形で、
-     (y θ^k)' = (y' + k u' y) θ^k なので、y' + k u' y = p_k を解く。
+  (* k ≥ 1 の各項について y' + k u' y = p_k を解き、y θ^k をつくる。
      解がなければ初等関数では書けない *)
   let integrate (f: E.t): A.t Integral.result =
     match E.to_poly f with
@@ -28,7 +27,7 @@ module Make: FUNCTOR_TYPE =
       let u' = I.F.differentiate E.argument in
       let ys =
         List.mapi
-          (fun i p_i -> I.solve_rde (I.F.mul (of_int (i + 1)) u') p_i) rest
+          (fun i p_i -> I.solve_rde (I.F.mul (of_integer (i + 1)) u') p_i) rest
       in
       if List.mem None ys then Integral.Not_elementary
       else

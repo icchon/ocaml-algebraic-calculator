@@ -41,7 +41,7 @@ module Make: FUNCTOR_TYPE = functor (R: Ring) -> struct
     let n = R.mul n1 n2 in
     let d = R.mul d1 d2 in
     (n, d) |> normalize
-  (* 逆数 *)
+  (* 逆元 *)
   let inv ((n, d): t): t =
     if R.equal n R.zero then
       failwith "Division by zero"
@@ -57,13 +57,13 @@ module Make: FUNCTOR_TYPE = functor (R: Ring) -> struct
     let (n2, d2) = normalize x2 in
     R.equal n1 n2 && R.equal d1 d2
 
-  include Mul_monoid.Extend(struct
-    type nonrec t = t
-    let one, mul, equal = one, mul, equal
-  end)
   include Add_group.Extend(struct
     type nonrec t = t
     let add, neg = add, neg 
+  end)
+  include Mul_monoid.Extend(struct
+    type nonrec t = t
+    let one, mul = one, mul
   end)
   include Mul_group.Extend(struct
     type nonrec t = t

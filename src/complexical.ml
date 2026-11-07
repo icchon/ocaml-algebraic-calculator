@@ -34,13 +34,13 @@ module Make: FUNCTOR_TYPE = functor (F: Field) -> struct
     let norm = norm2 x in
     let (a, b) = conj x in
     (F.div a norm, F.div b norm)
-  include Mul_monoid.Extend(struct
-    type nonrec t = t
-    let one, mul, equal = one, mul, equal
-  end)
   include Add_group.Extend(struct
     type nonrec t = t
     let add, neg = add, neg
+  end)
+  include Mul_monoid.Extend(struct
+    type nonrec t = t
+    let one, mul = one, mul
   end)
   include Mul_group.Extend(struct
     type nonrec t = t

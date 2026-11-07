@@ -3,7 +3,7 @@ include Polynomial.Make(Rational)
 (* ここから先は、多項式の根を求める付録で使う *)
 
 (* 整数係数への変換 *)
-let to_integer_poly (p : t) : Integer.t list * Integer.t * Integer.t =
+let to_integer_poly (p: t): Integer.t list * Integer.t * Integer.t =
   let denoms = List.map snd p in
   let common_denom = List.fold_left Integer.lcm Integer.one denoms in
   let int_coeffs = 
@@ -16,7 +16,7 @@ let to_integer_poly (p : t) : Integer.t list * Integer.t * Integer.t =
   (int_coeffs, a0, an)
 
 (* 約数の列挙 *)
-let divisors (n : Integer.t) : Integer.t list =
+let divisors (n: Integer.t): Integer.t list =
   let abs_n = Integer.abs n in
   if Integer.equal abs_n Integer.zero then []
   else
@@ -39,7 +39,7 @@ let divisors (n : Integer.t) : Integer.t list =
     List.concat_map (fun d -> [d; Integer.neg d]) pos_divs
 
 (* 求解 *)
-let rec solve_equation (p : t) : Rational.t list =
+let rec solve_equation (p: t): Rational.t list =
   if degree p < 1 then []
   else
     let (_, a0, an) = to_integer_poly p in

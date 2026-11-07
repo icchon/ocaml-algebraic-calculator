@@ -2,23 +2,23 @@
 module type S = sig
   type coeff
   type t = coeff list
+  val equal: t -> t -> bool
   val zero: t
   val one: t
-  val normalize: t -> t
-  val equal: t -> t -> bool
-  val degree: t -> int
-  val mul: t -> t -> t
   val add: t -> t -> t
   val neg: t -> t
-  val eval: t -> coeff -> coeff
-  val div_rem: t -> t -> t * t
-  val pow: int -> t -> t
   val sub: t -> t -> t
+  val mul: t -> t -> t
+  val pow: int -> t -> t
+  val div_rem: t -> t -> t * t
   val gcd: t -> t -> t
   val ext_gcd: t -> t -> t * t * t
+  val normalize: t -> t
+  val degree: t -> int
   val leading_coeff: t -> coeff
-  val div_scalar: coeff -> t -> t
+  val eval: t -> coeff -> coeff
   val mul_scalar: coeff -> t -> t
+  val div_scalar: coeff -> t -> t
 end
 
 module type FUNCTOR_TYPE = functor (C: Field.S) -> (S with type coeff = C.t)
@@ -51,7 +51,7 @@ module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
     aux p1 p2
 
   (* 次数 *)
-  let degree (p: t) : int =
+  let degree (p: t): int =
     match normalize p with
     | [] -> -1
     | p' -> List.length p' - 1
@@ -92,20 +92,19 @@ module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
     List.mapi (fun i c -> C.mul c (C.pow i x)) xs
     |> List.fold_left (fun acc s -> C.add acc s) C.zero
 
-  include Mul_monoid.Extend(struct
-    type nonrec t = t
-    let one, mul = one, mul
-  end)
-  
   include Add_group.Extend(struct
     type nonrec t = t
     let add, neg = add, neg
   end)
+  include Mul_monoid.Extend(struct
+    type nonrec t = t
+    let one, mul = one, mul
+  end)
 
-  (* 除法（商と余り） *)
-  let div_rem (num: t) (den: t) : t * t =
+  (* 商と余り *)
+  let div_rem (num: t) (den: t): t * t =
     let den_norm = normalize den in
-    if den_norm = [] then failwith "Division by zero polynomial"
+    if den_norm = [] then failwith "Division by zero"
     else
       let lc_den = List.nth den_norm (List.length den_norm - 1) in
       let deg_den = degree den_norm in
@@ -136,7 +135,7 @@ module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
     include (Vector_space.Make(C)(struct
       include List
       let make x = []
-    end) : sig
+    end): sig
       type t
       val mul_scalar: C.t -> t -> t
       val div_scalar: C.t -> t -> t
