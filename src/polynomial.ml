@@ -58,9 +58,9 @@ module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
 
   (* 最高次係数 *)
   let leading_coeff (p: t): C.t =
-    match List.rev p with
+    match List.rev (normalize p) with
     | [] -> C.zero
-    | x::xs -> x
+    | c :: _ -> c
 
   (* 乗法 *)
   let mul (x1: t) (x2: t): t =
@@ -126,18 +126,18 @@ module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
           aux new_rem new_quo
       in
       aux num []
-    include Euclidean.Extend(struct
-      type nonrec t = t
-      let zero, one, sub, mul, div_rem, equal =
-        zero, one, sub, mul, div_rem, equal
-    end)
+  include Euclidean.Extend(struct
+    type nonrec t = t
+    let equal, zero, one, sub, mul, div_rem =
+      equal, zero, one, sub, mul, div_rem
+  end)
 
-    include (Vector_space.Make(C)(struct
-      include List
-      let make x = []
-    end): sig
-      type t
-      val mul_scalar: C.t -> t -> t
-      val div_scalar: C.t -> t -> t
-    end with type t := t)
+  include (Vector_space.Make(C)(struct
+    include List
+    let make x = []
+  end): sig
+    type t
+    val mul_scalar: C.t -> t -> t
+    val div_scalar: C.t -> t -> t
+  end with type t := t)
 end

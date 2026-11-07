@@ -1,14 +1,14 @@
 
-module type IrreduciblePoly = sig
-  module C : Field.S
-  module P : Polynomial.S with type coeff = C.t
+module type IRREDUCIBLE_POLY = sig
+  module C: Field.S
+  module P: Polynomial.S with type coeff = C.t
   val poly: P.t
 end
 
 module type FUNCTOR_TYPE =
-  functor (I: IrreduciblePoly) -> (Field.S with type t = I.P.t)
+  functor (I: IRREDUCIBLE_POLY) -> (Field.S with type t = I.P.t)
 
-module Make: FUNCTOR_TYPE = functor (I: IrreduciblePoly) -> struct
+module Make: FUNCTOR_TYPE = functor (I: IRREDUCIBLE_POLY) -> struct
   include I.P
   (* 正規化 *)
   let normalize (p: t): t =

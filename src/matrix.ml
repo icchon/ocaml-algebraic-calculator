@@ -1,5 +1,5 @@
 
-module type MatrixDim = sig
+module type MATRIX_DIM = sig
     val rows: int
     val cols: int
 end
@@ -11,10 +11,10 @@ module type S = sig
 end
 
 module type FUNCTOR_TYPE =
-  functor (D: MatrixDim) (F: Field.S) ->
+  functor (D: MATRIX_DIM) (F: Field.S) ->
     (S with type scalar = F.t and type t = F.t list list)
 
-module Make: FUNCTOR_TYPE = functor (D: MatrixDim) (F: Field.S) -> struct
+module Make: FUNCTOR_TYPE = functor (D: MATRIX_DIM) (F: Field.S) -> struct
   module Container = struct
     type 'a t = 'a list list
     (* 定数行列の生成 *)

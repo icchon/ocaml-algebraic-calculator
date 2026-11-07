@@ -1,7 +1,7 @@
 type t = int
 (* 等価判定 *)
 let equal (x1: t) (x2: t): bool =
-   x1 = x2
+  x1 = x2
 let zero: t = 0
 let one: t = 1
 (* 加法 *)
@@ -34,7 +34,8 @@ include Mul_monoid.Extend(struct
 end)
 include Euclidean.Extend(struct
   type nonrec t = t
-  let zero, one, sub, mul, div_rem, equal = zero, one, sub, mul, div_rem, equal
+  let equal, zero, one, sub, mul, div_rem =
+    equal, zero, one, sub, mul, div_rem
 end)
 
 (* ここから先は2次方程式の章で追加 *)

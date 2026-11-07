@@ -2,12 +2,12 @@
 
 module type MIN = sig
   type t
+  val equal: t -> t -> bool
   val zero: t
   val one: t
   val sub: t -> t -> t
   val mul: t -> t -> t
   val div_rem: t -> t -> t * t
-  val equal: t -> t -> bool
 end
 
 module type S = sig

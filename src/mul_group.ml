@@ -9,7 +9,6 @@ module type S = sig
   include MIN
   include Mul_monoid.S with type t := t
   val div: t -> t -> t
-  val pow: int -> t -> t
 end
 
 module Extend(M: MIN) = struct

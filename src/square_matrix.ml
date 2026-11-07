@@ -1,5 +1,5 @@
 
-module type Dim = sig
+module type DIM = sig
   val dim: int
 end
 
@@ -10,10 +10,10 @@ module type S = sig
 end
 
 module type FUNCTOR_TYPE =
-  functor (D: Dim) (F: Field.S) ->
+  functor (D: DIM) (F: Field.S) ->
     (S with type scalar = F.t and type t = F.t list list)
 
-module Make: FUNCTOR_TYPE = functor (D: Dim) (F: Field.S) -> struct
+module Make: FUNCTOR_TYPE = functor (D: DIM) (F: Field.S) -> struct
   include Matrix.Make(struct
     let cols = D.dim
     let rows = D.dim

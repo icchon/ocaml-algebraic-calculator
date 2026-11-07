@@ -1,18 +1,18 @@
-(* Kで積分できれば、θ = log u を添加した K(θ) でも積分できる。
-   被積分関数はθの多項式 p0 + p1 θ + p2 θ^2 + ...（p_i ∈ K）に限る *)
+(* Fで積分できれば、θ = log u を添加した F(θ) でも積分できる。
+   被積分関数はθの多項式 p0 + p1 θ + p2 θ^2 + ...（p_i ∈ F）に限る *)
 module type FUNCTOR_TYPE =
-  functor (I: Integral.S) (L: Tower.ELEMENTARY with module K = I.F) ->
+  functor (I: Integral.S) (L: Tower.ELEMENTARY with module F = I.F) ->
     (Integral.S with module F = L)
 
 module Make: FUNCTOR_TYPE =
-  functor (I: Integral.S) (L: Tower.ELEMENTARY with module K = I.F) -> struct
+  functor (I: Integral.S) (L: Tower.ELEMENTARY with module F = I.F) -> struct
   module F = L
   module A = Liouville.Make(L)
 
-  (* 整数をKの元として埋め込む *)
+  (* 整数をFの元として埋め込む *)
   let rec of_integer (n: int): I.F.t = if n = 0 then I.F.zero else I.F.add I.F.one (of_integer (n - 1))
 
-  (* Kでの答えを K(θ) へ持ち上げる。c log u は c θ にまとめる *)
+  (* Fでの答えを F(θ) へ持ち上げる。c log u は c θ にまとめる *)
   let lift (b: I.A.t): A.t =
     List.fold_left (fun acc (c, w) ->
       if I.F.equal w L.argument then
@@ -20,7 +20,7 @@ module Make: FUNCTOR_TYPE =
       else A.add acc (A.log c (L.of_base w)))
       (A.of_field (L.of_base b.v)) b.logs
 
-  (* Kでの答え s + c log u を、sとcに分ける。u以外のlogは扱わない *)
+  (* Fでの答え s + c log u を、sとcに分ける。u以外のlogは扱わない *)
   let split (b: I.A.t): I.F.t * I.F.t =
     List.fold_left (fun (s, c) (c', w) ->
       if I.F.equal w L.argument then (s, I.F.add c (I.F.of_constant c'))
@@ -46,7 +46,7 @@ module Make: FUNCTOR_TYPE =
 
   let integrate (f: L.t): A.t Integral.result = integrate_poly (L.to_poly f)
 
-  (* θを含まない a, g なら、Kでの解がそのまま使える *)
+  (* θを含まない a, g なら、Fでの解がそのまま使える *)
   let solve_rde (a: L.t) (g: L.t): L.t option =
     Option.map L.of_base (I.solve_rde (L.to_base a) (L.to_base g))
 end

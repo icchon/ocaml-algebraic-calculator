@@ -1,12 +1,12 @@
-module type Field = sig
+module type FIELD = sig
   include Field.S
   val conj: t -> t
 end
 
 module type FUNCTOR_TYPE =
-  functor (F: Field) -> (Field with type t = F.t * F.t)
+  functor (F: FIELD) -> (FIELD with type t = F.t * F.t)
 
-module Make: FUNCTOR_TYPE = functor (F: Field) -> struct
+module Make: FUNCTOR_TYPE = functor (F: FIELD) -> struct
   type t = F.t * F.t
   (* 等価判定 *)
   let equal ((a1, b1): t) ((a2, b2): t): bool =

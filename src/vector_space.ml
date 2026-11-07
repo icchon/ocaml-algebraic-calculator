@@ -1,4 +1,4 @@
-module type Container = sig
+module type CONTAINER = sig
   type 'a t
   val make: 'a -> 'a t
   val map: ('a -> 'b) -> 'a t -> 'b t
@@ -7,19 +7,19 @@ module type Container = sig
 end
 
 module type S = sig
-    type t
-    type scalar
-    val equal: t -> t -> bool
-    include Add_group.S with type t := t
-    val mul_scalar: scalar -> t -> t
-    val div_scalar: scalar -> t -> t
+  type t
+  type scalar
+  val equal: t -> t -> bool
+  include Add_group.S with type t := t
+  val mul_scalar: scalar -> t -> t
+  val div_scalar: scalar -> t -> t
 end
 
 module type FUNCTOR_TYPE =
-  functor (F: Field.S) (C: Container) ->
+  functor (F: Field.S) (C: CONTAINER) ->
     (S with type scalar = F.t and type t = F.t C.t)
 
-module Make: FUNCTOR_TYPE = functor (F: Field.S) (C: Container) -> struct
+module Make: FUNCTOR_TYPE = functor (F: Field.S) (C: CONTAINER) -> struct
   type t = F.t C.t
   type scalar = F.t
   (* 等価判定 *)

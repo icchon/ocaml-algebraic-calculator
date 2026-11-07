@@ -1,13 +1,13 @@
 
-module type Dim = sig
+module type DIM = sig
   val dim: int
 end
 
 module type FUNCTOR_TYPE =
-  functor (D: Dim) (F: Field.S) ->
+  functor (D: DIM) (F: Field.S) ->
     (Vector_space.S with type scalar = F.t and type t = F.t list)
 
-module Make: FUNCTOR_TYPE = functor (D: Dim) (F: Field.S) -> struct
+module Make: FUNCTOR_TYPE = functor (D: DIM) (F: Field.S) -> struct
   module Container = struct
     include List
     (* 定数ベクトルの生成 *)
