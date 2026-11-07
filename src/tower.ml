@@ -22,7 +22,7 @@ end
 
 module type DERIVATIVE = sig
   module K: Differential.S
-  val derivative: K.t list (* θ' *)
+  val derivative: K.t list (* θ' = f(θ) の f の係数 *)
 end
 
 module type FUNCTOR_TYPE =
@@ -35,12 +35,14 @@ module Make: FUNCTOR_TYPE = functor (D: DERIVATIVE) -> struct
     (* 整数をKの元として埋め込む *)
     let rec of_int (n: int): K.t =
       if n <= 0 then K.zero else K.add K.one (of_int (n - 1))
-    (* θについてのべき乗則: c0 + c1 θ + c2 θ^2 + ... から c1 + 2 c2 θ + 3 c3 θ^2 + ... をつくる *)
+    (* θについてのべき乗則: c0 + c1 θ + c2 θ^2 + ... から
+       c1 + 2 c2 θ + 3 c3 θ^2 + ... をつくる *)
     let power_rule (p: t): t =
       match p with
       | [] -> []
       | _ :: rest -> List.mapi (fun i c -> K.mul c (of_int (i + 1))) rest
-    (* 微分: (c0 + c1 θ + ...)' = (c0' + c1' θ + ...) + (c1 + 2 c2 θ + ...) θ' *)
+    (* 微分: (c0 + c1 θ + ...)' =
+         (c0' + c1' θ + ...) + (c1 + 2 c2 θ + ...) θ' *)
     let differentiate (p: t): t =
       add (List.map K.differentiate p) (mul (power_rule p) D.derivative)
     (* 最大公約数。定数倍の分だけ選び方が残るので、最高次の係数をbとそろえる。
