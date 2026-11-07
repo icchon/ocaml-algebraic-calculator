@@ -20,7 +20,7 @@ let integrate_poly (s: P.t): P.t =
 
 (* 有理数への変換（分母の因数分解は有理数係数で行う） *)
 let to_rational ((re, im): Constant.t): Rational.t =
-  match Q_rootp.to_rational re, Q_rootp.equal im Q_rootp.zero with
+  match Q_sqrt.to_rational re, Q_sqrt.equal im Q_sqrt.zero with
   | Some q, true -> q
   | _ -> failwith "Rational_integral.integrate: denominator has a non-rational coefficient"
 
