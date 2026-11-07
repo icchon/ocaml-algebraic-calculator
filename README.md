@@ -7,7 +7,7 @@
 
 ## 準備
 
-OCaml 5.5.1 を opam で入れます（本書の付録B「環境構築」と同じ手順です）。
+OCaml 5.5.1 を opam で入れます（本書の付録C「環境構築」と同じ手順です）。
 
 ```sh
 brew install opam       # macOS
