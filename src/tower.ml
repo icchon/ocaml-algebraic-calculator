@@ -45,13 +45,6 @@ module Make: FUNCTOR_TYPE = functor (D: DERIVATIVE) -> struct
          (c0' + c1' θ + ...) + (c1 + 2 c2 θ + ...) θ' *)
     let differentiate (p: t): t =
       add (List.map F.differentiate p) (mul (power_rule p) D.derivative)
-    (* 最大公約数。定数倍の分だけ選び方が残るので、最高次の係数をbとそろえる。
-       分数体ファンクタは分子と分母をgcd n dで割るので、分母の最高次の係数が
-       1になり、分数の表し方が1つに決まる *)
-    let gcd (a: t) (b: t): t =
-      match normalize (gcd a b), normalize b with
-      | [], _ | _, [] -> gcd a b
-      | g, b -> mul_scalar (F.div (leading_coeff b) (leading_coeff g)) g
     (* 全順序 *)
     let rec compare (x1: t) (x2: t): int =
       match x1, x2 with
@@ -65,7 +58,7 @@ module Make: FUNCTOR_TYPE = functor (D: DERIVATIVE) -> struct
   include Fraction.Make(P)
   type constant = F.constant
 
-  let of_poly (p: P.t): t = (P.normalize p, P.one)
+  let of_poly (p: P.t): t = (P.trim p, P.one)
   let of_base (k: F.t): t = of_poly [k]
   let of_constant (c: constant): t = of_base (F.of_constant c)
   let theta: t = of_poly [F.zero; F.one]
@@ -77,8 +70,8 @@ module Make: FUNCTOR_TYPE = functor (D: DERIVATIVE) -> struct
 
   (* θの多項式とみなす。分母がθを含むなら扱わない *)
   let to_poly ((n, d): t): P.t =
-    match P.normalize d with
-    | [d0] -> P.div_scalar d0 (P.normalize n)
+    match P.trim d with
+    | [d0] -> P.div_scalar d0 (P.trim n)
     | _ -> failwith "Tower.to_poly: theta appears in the denominator"
 
   (* Fの元とみなす。θを含むなら扱わない *)

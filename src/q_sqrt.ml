@@ -16,10 +16,15 @@ let normalize (terms: (basis * Coeff.t) list): t =
     | (s1, c1) :: (s2, c2) :: rest when compare_basis s1 s2 = 0 ->
         merge ((s1, Coeff.add c1 c2) :: rest)
     | (_, c) :: rest when Coeff.equal c Coeff.zero -> merge rest
-    | term :: rest -> term :: merge rest
+    | (s, c) :: rest -> (s, Coeff.normalize c) :: merge rest
     | [] -> []
   in
   merge (List.sort by_basis terms)
+
+include Normal_form.Extend(struct
+  type nonrec t = t
+  let normalize = normalize
+end)
 
 let zero: t = []
 let one: t = [([], Coeff.one)]
@@ -52,10 +57,6 @@ let mul (v1: t) (v2: t): t =
 include Add_group.Extend(struct
   type nonrec t = t
   let add, neg = add, neg
-end)
-include Mul_monoid.Extend(struct
-  type nonrec t = t
-  let one, mul = one, mul
 end)
 
 (* 有理数の埋め込み *)
@@ -93,10 +94,6 @@ let compare (x1: t) (x2: t): int =
     let o = compare_basis s1 s2 in
     if o <> 0 then o else Coeff.compare c1 c2
   ) x1 x2
-
-(* 等価判定 *)
-let equal (x1: t) (x2: t): bool =
-  compare x1 x2 = 0
 
 (* 登場する素数全体 *)
 let collect_primes (v: t): basis =

@@ -8,9 +8,13 @@ module type FUNCTOR_TYPE =
 
 module Make: FUNCTOR_TYPE = functor (F: FIELD) -> struct
   type t = F.t * F.t
-  (* 等価判定 *)
-  let equal ((a1, b1): t) ((a2, b2): t): bool =
-    (F.equal a1 a2) && (F.equal b1 b2)
+  (* 正規化：実部と虚部をそれぞれ正規化する *)
+  let normalize ((a, b): t): t =
+    (F.normalize a, F.normalize b)
+  include Normal_form.Extend(struct
+    type nonrec t = t
+    let normalize = normalize
+  end)
   let zero: t = (F.zero, F.zero)
   let one: t = (F.one, F.zero)
   (* 加法 *)
@@ -37,10 +41,6 @@ module Make: FUNCTOR_TYPE = functor (F: FIELD) -> struct
   include Add_group.Extend(struct
     type nonrec t = t
     let add, neg = add, neg
-  end)
-  include Mul_monoid.Extend(struct
-    type nonrec t = t
-    let one, mul = one, mul
   end)
   include Mul_group.Extend(struct
     type nonrec t = t

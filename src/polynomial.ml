@@ -11,8 +11,10 @@ module type S = sig
   val mul: t -> t -> t
   val pow: int -> t -> t
   val div_rem: t -> t -> t * t
+  val canonical: t -> t
   val gcd: t -> t -> t
   val ext_gcd: t -> t -> t * t * t
+  val trim: t -> t
   val normalize: t -> t
   val degree: t -> int
   val leading_coeff: t -> coeff
@@ -26,10 +28,8 @@ module type FUNCTOR_TYPE = functor (C: Field.S) -> (S with type coeff = C.t)
 module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
   type t = C.t list
   type coeff = C.t
-  let zero: t = []
-  let one: t = [C.one]
-  (* 正規化 *)
-  let normalize (x: t): t =
+  (* 末尾の0（最高次の側の0）を取り除く *)
+  let trim (x: t): t =
     let rec remove_leading_zeros = function
       | [] -> []
       | c :: cs ->
@@ -37,35 +37,32 @@ module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
         else c :: cs
     in
     List.rev x |> remove_leading_zeros |> List.rev
-
-  (* 等価判定 *)
-  let equal (x1: t) (x2: t): bool =
-    let p1 = normalize x1 in
-    let p2 = normalize x2 in
-    let rec aux l1 l2 =
-      match l1, l2 with
-      | [], [] -> true
-      | [], _ | _, [] -> false
-      | c1 :: cs1, c2 :: cs2 -> C.equal c1 c2 && aux cs1 cs2
-    in
-    aux p1 p2
+  (* 正規化：係数を正規化し、末尾の0を取り除く *)
+  let normalize (x: t): t =
+    List.map C.normalize x |> trim
+  include Normal_form.Extend(struct
+    type nonrec t = t
+    let normalize = normalize
+  end)
+  let zero: t = []
+  let one: t = [C.one]
 
   (* 次数 *)
   let degree (p: t): int =
-    match normalize p with
+    match trim p with
     | [] -> -1
     | p' -> List.length p' - 1
 
   (* 最高次係数 *)
   let leading_coeff (p: t): C.t =
-    match List.rev (normalize p) with
+    match List.rev (trim p) with
     | [] -> C.zero
     | c :: _ -> c
 
   (* 乗法 *)
   let mul (x1: t) (x2: t): t =
-    let p1 = normalize x1 in
-    let p2 = normalize x2 in
+    let p1 = trim x1 in
+    let p2 = trim x2 in
     if p1 = [] || p2 = [] then []
     else
       let res_len = List.length p1 + List.length p2 - 1 in
@@ -75,7 +72,7 @@ module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
           res.(i + j) <- C.add res.(i + j) (C.mul c1 c2)
         ) p2
       ) p1;
-      Array.to_list res |> normalize
+      Array.to_list res |> trim
 
   (* 加法 *)
   let rec add (x1: t) (x2: t): t =
@@ -103,16 +100,16 @@ module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
 
   (* 商と余り *)
   let div_rem (num: t) (den: t): t * t =
-    let den_norm = normalize den in
+    let den_norm = trim den in
     if den_norm = [] then failwith "Division by zero"
     else
       let lc_den = List.nth den_norm (List.length den_norm - 1) in
       let deg_den = degree den_norm in
       let rec aux rem quo_acc =
-        let rem_norm = normalize rem in
+        let rem_norm = trim rem in
         let deg_rem = degree rem_norm in
         if deg_rem < deg_den then
-          (normalize quo_acc, rem_norm)
+          (trim quo_acc, rem_norm)
         else
           let lc_rem = List.nth rem_norm deg_rem in
           let factor = C.div lc_rem lc_den in
@@ -132,15 +129,14 @@ module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
   let div_scalar (s: C.t) (p: t): t = List.map (fun c -> C.div c s) p
 
   (* 最高次の係数を1にそろえる（モニック） *)
-  let monic (p: t): t =
-    match normalize p with
+  let canonical (p: t): t =
+    match trim p with
     | [] -> []
     | p' -> div_scalar (leading_coeff p') p'
 
   include Euclidean.Extend(struct
     type nonrec t = t
-    let equal, zero, one, sub, mul, div_rem =
-      equal, zero, one, sub, mul, div_rem
-    let canonical = monic
+    let equal, zero, one, sub, mul, div_rem, canonical =
+      equal, zero, one, sub, mul, div_rem, canonical
   end)
 end

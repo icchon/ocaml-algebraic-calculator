@@ -1,7 +1,7 @@
 type t = int
-(* 等価判定 *)
-let equal (x1: t) (x2: t): bool =
-  x1 = x2
+(* 正規化：整数の表し方は、もともと1とおり *)
+let normalize (x: t): t =
+  x
 let zero: t = 0
 let one: t = 1
 (* 加法 *)
@@ -23,7 +23,14 @@ let compare (x1: t) (x2: t): int =
 (* 絶対値 *)
 let abs (x: t): t =
   if compare x zero >= 0 then x else neg x
+(* 符号のそろえ方（正にする） *)
+let canonical (x: t): t =
+  abs x
 
+include Normal_form.Extend(struct
+  type nonrec t = t
+  let normalize = normalize
+end)
 include Add_group.Extend(struct
   type nonrec t = t
   let add, neg = add, neg
@@ -34,9 +41,8 @@ include Mul_monoid.Extend(struct
 end)
 include Euclidean.Extend(struct
   type nonrec t = t
-  let equal, zero, one, sub, mul, div_rem =
-    equal, zero, one, sub, mul, div_rem
-  let canonical = abs
+  let equal, zero, one, sub, mul, div_rem, canonical =
+    equal, zero, one, sub, mul, div_rem, canonical
 end)
 
 (* ここから先は2次方程式の章で追加 *)

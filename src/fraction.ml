@@ -2,8 +2,9 @@
 module type RING = sig
   include Ring.S
   val compare: t -> t -> int
-  val gcd: t -> t -> t
   val div_rem: t -> t -> t * t
+  val canonical: t -> t
+  val gcd: t -> t -> t
 end
 
 module type FUNCTOR_TYPE = functor (R: RING) ->
@@ -14,20 +15,18 @@ module type FUNCTOR_TYPE = functor (R: RING) ->
 
 module Make: FUNCTOR_TYPE = functor (R: RING) -> struct
   type t = R.t * R.t
-  (* 約分と符号の正規化 *)
+  (* 約分し、分母をそろえる *)
   let normalize ((n, d): t): t =
     let g = R.gcd n d in
     let n' = R.div_rem n g |> fst in
     let d' = R.div_rem d g |> fst in
-    if R.compare d' R.zero < 0 then
-      (R.neg n', R.neg d')
-    else
-      (n', d')
-  (* 等価判定 *)
-  let equal (x1: t) (x2: t): bool =
-    let (n1, d1) = normalize x1 in
-    let (n2, d2) = normalize x2 in
-    R.equal n1 n2 && R.equal d1 d2
+    (* 分母の符号・最高次の係数の分 *)
+    let u = R.div_rem d' (R.canonical d') |> fst in
+    (R.normalize (R.div_rem n' u |> fst), R.normalize (R.canonical d'))
+  include Normal_form.Extend(struct
+    type nonrec t = t
+    let normalize = normalize
+  end)
   let zero: t = (R.zero, R.one)
   let one: t = (R.one, R.one)
   (* 加法 *)
@@ -56,10 +55,6 @@ module Make: FUNCTOR_TYPE = functor (R: RING) -> struct
   include Add_group.Extend(struct
     type nonrec t = t
     let add, neg = add, neg
-  end)
-  include Mul_monoid.Extend(struct
-    type nonrec t = t
-    let one, mul = one, mul
   end)
   include Mul_group.Extend(struct
     type nonrec t = t

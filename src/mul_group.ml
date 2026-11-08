@@ -12,15 +12,12 @@ module type S = sig
 end
 
 module Extend(M: MIN) = struct
+  module Monoid = Mul_monoid.Extend(M)
   (* 除法 *)
   let div (x1: M.t) (x2: M.t): M.t =
     M.mul x1 (M.inv x2)
-  (* 累乗 *)
+  (* 累乗：負の指数は、逆元の累乗 *)
   let pow (n: int) (x: M.t): M.t =
-    let base = if n >= 0 then x else M.inv x in
-    let rec aux acc n =
-      if n = 0 then acc
-      else aux (M.mul acc base) (n - 1)
-    in
-    aux M.one (abs n)
+    if n >= 0 then Monoid.pow n x
+    else Monoid.pow (-n) (M.inv x)
 end
