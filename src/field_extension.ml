@@ -34,10 +34,8 @@ module Make: FUNCTOR_TYPE = functor (I: IRREDUCIBLE_POLY) -> struct
     if equal x_norm zero then
       failwith "Division by zero"
     else
-      let (g, u, _) = I.P.ext_gcd x_norm I.poly in
-      let lc = I.P.leading_coeff g in
-      let x_inv = I.P.div_scalar lc u in
-      normalize x_inv
+      let (_, u, _) = I.P.ext_gcd x_norm I.poly in
+      normalize u
 
   include Add_group.Extend(struct
     type nonrec t = t
