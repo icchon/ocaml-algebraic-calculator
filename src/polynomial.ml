@@ -132,12 +132,8 @@ module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
       equal, zero, one, sub, mul, div_rem
   end)
 
-  include (Vector_space.Make(C)(struct
-    include List
-    let make x = []
-  end): sig
-    type t
-    val mul_scalar: C.t -> t -> t
-    val div_scalar: C.t -> t -> t
-  end with type t := t)
+  (* スカラー倍 *)
+  let mul_scalar (s: C.t) (p: t): t = List.map (C.mul s) p
+  (* スカラーでの除法 *)
+  let div_scalar (s: C.t) (p: t): t = List.map (fun c -> C.div c s) p
 end
