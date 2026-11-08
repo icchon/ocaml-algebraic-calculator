@@ -58,9 +58,11 @@ module Make: FUNCTOR_TYPE = functor (D: DERIVATIVE) -> struct
   include Fraction.Make(P)
   type constant = F.constant
 
+  (* 埋め込み：θの多項式・1つ下の体の元・定数を、分母1の分数とみなす *)
   let of_poly (p: P.t): t = (P.trim p, P.one)
   let of_base (k: F.t): t = of_poly [k]
   let of_constant (c: constant): t = of_base (F.of_constant c)
+  (* 添加した元θ（θの多項式 0 + 1θ） *)
   let theta: t = of_poly [F.zero; F.one]
 
   (* 微分: 商の微分法 (n/d)' = (n'd - nd')/d^2 *)
