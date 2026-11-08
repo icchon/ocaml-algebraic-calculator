@@ -126,11 +126,16 @@ module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
           aux new_rem new_quo
       in
       aux num []
+  (* スカラー倍 *)
+  let mul_scalar (s: C.t) (p: t): t = List.map (C.mul s) p
+  (* スカラーでの除法 *)
+  let div_scalar (s: C.t) (p: t): t = List.map (fun c -> C.div c s) p
+
   (* 最高次の係数を1にそろえる（モニック） *)
   let monic (p: t): t =
     match normalize p with
     | [] -> []
-    | p' -> List.map (fun c -> C.div c (leading_coeff p')) p'
+    | p' -> div_scalar (leading_coeff p') p'
 
   include Euclidean.Extend(struct
     type nonrec t = t
@@ -138,9 +143,4 @@ module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
       equal, zero, one, sub, mul, div_rem
     let canonical = monic
   end)
-
-  (* スカラー倍 *)
-  let mul_scalar (s: C.t) (p: t): t = List.map (C.mul s) p
-  (* スカラーでの除法 *)
-  let div_scalar (s: C.t) (p: t): t = List.map (fun c -> C.div c s) p
 end
