@@ -1,7 +1,5 @@
 include Polynomial.Make(Rational)
 
-(* ここから先は、多項式の根を求める付録で使う *)
-
 (* 整数係数への変換 *)
 let to_integer_poly (p: t): Integer.t list * Integer.t * Integer.t =
   let denoms = List.map snd p in

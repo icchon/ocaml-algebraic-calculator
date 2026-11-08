@@ -5,12 +5,6 @@ module type MIN = sig
   val inv: t -> t
 end
 
-module type S = sig
-  include MIN
-  include Mul_monoid.S with type t := t
-  val div: t -> t -> t
-end
-
 module Extend(M: MIN) = struct
   module Monoid = Mul_monoid.Extend(M)
   (* 除法 *)
@@ -20,4 +14,10 @@ module Extend(M: MIN) = struct
   let pow (n: int) (x: M.t): M.t =
     if n >= 0 then Monoid.pow n x
     else Monoid.pow (-n) (M.inv x)
+end
+
+module type S = sig
+  include MIN
+  include Mul_monoid.S with type t := t
+  val div: t -> t -> t
 end

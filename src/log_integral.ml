@@ -1,5 +1,5 @@
-(* Fで積分できれば、θ = log u を添加した F(θ) でも積分できる。
-   被積分関数はθの多項式 p0 + p1 θ + p2 θ^2 + ...（p_i ∈ F）に限る *)
+(* θ = log u を添加した F(θ) での積分。被積分関数はθの多項式に限る。
+   Fでの積分を使う *)
 module type FUNCTOR_TYPE =
   functor (I: Integral.S) (L: Tower.ELEMENTARY with module F = I.F) ->
     (Integral.S with module F = L)

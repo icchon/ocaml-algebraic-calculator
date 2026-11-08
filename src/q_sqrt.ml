@@ -124,95 +124,9 @@ end)
 (* 共役 *)
 let conj (x: t): t = x
 
-(* ここから先は3次方程式の章で追加 *)
-
-(* スカラー倍 *)
-let mul_scalar (k: Coeff.t) (v: t): t =
-  normalize (List.map (fun (s, c) -> (s, Coeff.mul k c)) v)
-
-(* スカラーでの除法 *)
-let div_scalar (k: Coeff.t) (v: t): t =
-  mul_scalar (Coeff.inv k) v
-
-(* 登場する素数の最大値 *)
-let max_prime (x: t): Integer.t option =
-  List.fold_left (fun _ p -> Some p) None (collect_primes x)
-
-(* √pの生成 *)
-let make_sqrt_prime (p: Integer.t): t =
-  [([p], Coeff.one)]
-
-(* 有理数への変換 *)
+(* 有理数への変換。√pを含むならNone *)
 let to_rational (x: t): Coeff.t option =
   match x with
   | [] -> Some Coeff.zero
   | [([], c)] -> Some c
   | _ -> None
-
-(* 有理数判定 *)
-let is_rational (x: t): bool =
-  match to_rational x with
-  | Some _ -> true
-  | None -> false
-
-(* 立方根 *)
-let rec cbrt (x: t): t option =
-    if equal x zero then Some zero
-    else if is_rational x then
-      match to_rational x with
-      | Some q -> (
-          match Rational.root 3 q with
-          | Some r -> Some (of_rational r)
-          | None -> None
-        )
-      | None -> None
-    else
-      match max_prime x with
-      | None -> None
-      | Some p ->
-          let a_elem, b = split_by_prime p x in
-          let sqrt_p = make_sqrt_prime p in
-          match to_rational a_elem with
-          | None -> None
-          | Some a ->
-              (* ノルム N(x) = a^2 - b^2 * p *)
-              let b2 = mul b b in
-              let p_elem = mul b2 (of_rational (Coeff.of_integer p)) in
-              let norm = sub (of_rational (Coeff.mul a a)) p_elem in
-
-              match cbrt norm with
-              | None -> None
-              | Some n_y_elem -> (
-                  match to_rational n_y_elem with
-                  | None -> None
-                  | Some n_y ->
-                      (* cの方程式: 4c^3 - 3*N_y*c - a = 0 *)
-                      let four = Coeff.of_integer 4 in
-                      let three = Coeff.of_integer 3 in
-                      let poly_c = [
-                        Coeff.neg a;
-                        Coeff.neg (Coeff.mul three n_y);
-                        Coeff.zero;
-                        four
-                      ] in
-
-                      let c_candidates = Q_poly.solve_equation poly_c in
-
-                      (* dの復元と検算 *)
-                      let try_construct q_c =
-                        if Coeff.equal q_c Coeff.zero then None
-                        else
-                          let c = of_rational q_c in
-                          let q_c2 = Coeff.mul q_c q_c in
-                          let q_denom = Coeff.sub (Coeff.mul four q_c2) n_y in
-                          if Coeff.equal q_denom Coeff.zero then None
-                          else
-                            let d = div_scalar q_denom b in
-                            let result = add c (mul d sqrt_p) in
-                            let result3 = mul (mul result result) result in
-                            if equal result3 x then Some result
-                            else None
-                      in
-
-                      List.find_map try_construct c_candidates
-                )

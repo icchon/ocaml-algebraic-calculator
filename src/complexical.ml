@@ -29,10 +29,8 @@ module Make: FUNCTOR_TYPE = functor (F: FIELD) -> struct
     (F.sub (F.mul a1 a2) (F.mul (F.conj b2) b1),
     F.add (F.mul b2 a1) (F.mul b1 (F.conj a2)))
 
-  (* 内積 *)
-  let dot (x1: t) (x2: t): F.t = mul x1 (conj x2) |> fst
   (* ノルムの2乗 *)
-  let norm2 (x: t): F.t = dot x x
+  let norm2 (x: t): F.t = mul x (conj x) |> fst
   (* 逆元 *)
   let inv (x: t): t =
     let norm = norm2 x in

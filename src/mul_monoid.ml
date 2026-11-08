@@ -1,15 +1,7 @@
-
-
 module type MIN = sig
   type t
   val one: t
   val mul: t -> t -> t
-end
-
-module type S = sig
-  include MIN
-  include Normal_form.S with type t := t
-  val pow: int -> t -> t
 end
 
 module Extend(M: MIN) = struct
@@ -20,4 +12,10 @@ module Extend(M: MIN) = struct
       else aux (M.mul acc x) (n-1)
     in
     aux M.one n
+end
+
+module type S = sig
+  include MIN
+  include Normal_form.S with type t := t
+  val pow: int -> t -> t
 end

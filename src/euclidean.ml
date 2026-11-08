@@ -1,5 +1,3 @@
-
-
 module type MIN = sig
   type t
   val equal: t -> t -> bool
@@ -9,12 +7,6 @@ module type MIN = sig
   val mul: t -> t -> t
   val div_rem: t -> t -> t * t
   val canonical: t -> t (* 符号・定数倍の違いをそろえる *)
-end
-
-module type S = sig
-  include MIN
-  val gcd: t -> t -> t
-  val ext_gcd: t -> t -> t * t * t
 end
 
 module Extend(M: MIN) = struct
