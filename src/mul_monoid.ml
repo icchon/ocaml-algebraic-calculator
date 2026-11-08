@@ -8,6 +8,7 @@ end
 
 module type S = sig
   include MIN
+  include Normal_form.S with type t := t
   val pow: int -> t -> t
 end
 

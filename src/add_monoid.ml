@@ -1,7 +1,7 @@
 
 
 module type S = sig
-  type t
+  include Normal_form.S
   val zero: t
   val add: t -> t -> t
 end
