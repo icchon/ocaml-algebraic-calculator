@@ -5,7 +5,8 @@ module type FUNCTOR_TYPE =
     (Integral.S with module F = L)
 
 module Make: FUNCTOR_TYPE =
-  functor (I: Integral.S) (L: Tower.ELEMENTARY with module F = I.F) -> struct
+  functor (I: Integral.S) (L: Tower.ELEMENTARY with module F = I.F) ->
+struct
   module F = L
   module A = Liouville.Make(L)
 
