@@ -31,10 +31,8 @@ let roots_of (q: P.t): (Constant.t * int) list =
   | None ->
     failwith "Rational_integral.integrate: the denominator has an irreducible factor of degree >= 3"
 
-(* 多重度mの根aの寄与。q = (x-a)^m h と分解すると、部分分数分解の
-   c_k/(x-a)^k（k = 1, ..., m）の係数は、g = r/h のテイラー展開から
-   c_(m-j) = g^(j)(a)/j! と決まる。c_1/(x-a) の積分は c_1 log(x-a)、
-   k >= 2 の c_k/(x-a)^k の積分は -c_k/((k-1)(x-a)^(k-1)) *)
+(* 多重度mの根aの寄与。q = (x-a)^m h のとき、c_k/(x-a)^k の係数は
+   c_(m-j) = g^(j)(a)/j!（g = r/h）。k = 1 は対数、k >= 2 は有理関数になる *)
 let root_term (r: P.t) (q: P.t) (a: Constant.t) (m: int): A.t =
   let lin = linear a in
   let h = fst (P.div_rem q (P.pow m lin)) in
