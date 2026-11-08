@@ -16,10 +16,7 @@ module Make: FUNCTOR_TYPE = functor (R: RING) -> struct
   type t = R.t * R.t
   (* 約分と符号の正規化 *)
   let normalize ((n, d): t): t =
-    let make_positive x =
-      if R.compare x R.zero >= 0 then x else R.neg x
-    in
-    let g = R.gcd (make_positive n) (make_positive d) in
+    let g = R.gcd n d in
     let n' = R.div_rem n g |> fst in
     let d' = R.div_rem d g |> fst in
     if R.compare d' R.zero < 0 then

@@ -8,6 +8,7 @@ module type MIN = sig
   val sub: t -> t -> t
   val mul: t -> t -> t
   val div_rem: t -> t -> t * t
+  val canonical: t -> t (* 符号・定数倍の違いをそろえる *)
 end
 
 module type S = sig
@@ -18,13 +19,16 @@ end
 
 module Extend(M: MIN) = struct
   (* 最大公約数 *)
-  let rec gcd (a: M.t) (b: M.t): M.t =
-    if M.equal b M.zero then a
-    else gcd b (M.div_rem a b |> snd)
+  let gcd (a: M.t) (b: M.t): M.t =
+    let rec aux a b =
+      if M.equal b M.zero then a
+      else aux b (M.div_rem a b |> snd)
+    in
+    M.canonical (aux a b)
 
   (* 最小公倍数 *)
   let lcm (a: M.t) (b: M.t): M.t =
-    M.div_rem (M.mul a b) (gcd a b) |> fst
+    M.canonical (M.div_rem (M.mul a b) (gcd a b) |> fst)
 
   (* 拡張ユークリッドの互除法 *)
   let rec ext_gcd (a: M.t) (b: M.t): M.t * M.t * M.t =

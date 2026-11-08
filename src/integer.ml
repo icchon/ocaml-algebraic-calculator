@@ -36,6 +36,7 @@ include Euclidean.Extend(struct
   type nonrec t = t
   let equal, zero, one, sub, mul, div_rem =
     equal, zero, one, sub, mul, div_rem
+  let canonical = abs
 end)
 
 (* ここから先は2次方程式の章で追加 *)

@@ -126,16 +126,18 @@ module Make: FUNCTOR_TYPE = functor (C: Field.S) -> struct
           aux new_rem new_quo
       in
       aux num []
+  (* 最高次の係数を1にそろえる（モニック） *)
+  let monic (p: t): t =
+    match normalize p with
+    | [] -> []
+    | p' -> List.map (fun c -> C.div c (leading_coeff p')) p'
+
   include Euclidean.Extend(struct
     type nonrec t = t
     let equal, zero, one, sub, mul, div_rem =
       equal, zero, one, sub, mul, div_rem
+    let canonical = monic
   end)
-  (* 最大公約数は、最高次の係数を1にそろえる（モニック） *)
-  let gcd (a: t) (b: t): t =
-    match normalize (gcd a b) with
-    | [] -> []
-    | g -> List.map (fun c -> C.div c (leading_coeff g)) g
 
   (* スカラー倍 *)
   let mul_scalar (s: C.t) (p: t): t = List.map (C.mul s) p
