@@ -17,7 +17,7 @@ module Extend(M: MIN) = struct
 end
 
 module type S = sig
-  include MIN
-  include Mul_monoid.S with type t := t
+  include Mul_monoid.S
+  val inv: t -> t
   val div: t -> t -> t
 end

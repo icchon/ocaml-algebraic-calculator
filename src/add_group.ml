@@ -10,7 +10,7 @@ module Extend(M: MIN) = struct
 end
 
 module type S = sig
-  include MIN
-  include Add_monoid.S with type t := t
+  include Add_monoid.S
+  val neg: t -> t
   val sub: t -> t -> t
 end
