@@ -22,7 +22,7 @@ module Extend(M: MIN) = struct
   let lcm (a: M.t) (b: M.t): M.t =
     M.canonical (M.div_rem (M.mul a b) (gcd a b) |> fst)
 
-  (* 拡張ユークリッドの互除法：gをそろえ、そろえるために割った分でu, vも割る *)
+  (* 拡張ユークリッドの互除法 *)
   let ext_gcd (a: M.t) (b: M.t): M.t * M.t * M.t =
     let rec aux a b =
       if M.equal b M.zero then (a, M.one, M.zero)
