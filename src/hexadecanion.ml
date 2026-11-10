@@ -1,1 +1,1 @@
-include Complexical.Make(Octonion)
+include Cayley_dickson.Make(Octonion)

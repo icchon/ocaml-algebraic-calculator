@@ -114,9 +114,6 @@ include Mul_group.Extend(struct
   let one, mul, inv = one, mul, inv
 end)
 
-(* 共役 *)
-let conj (x: t): t = x
-
 (* 有理数への変換。√pを含むならNone *)
 let to_rational (x: t): Coeff.t option =
   match x with

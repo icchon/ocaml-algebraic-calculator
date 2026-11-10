@@ -1,1 +1,1 @@
-include Complexical.Make(Complex)
+include Cayley_dickson.Make(Complex)
