@@ -33,7 +33,7 @@ struct
      (s θ^n + c/(n+1) θ^(n+1))' の最高次の項は p_n θ^n なので、
      これを引いた残りの次数は n より下がる *)
   let rec integrate_poly (p: L.P.t): A.t Integral.result =
-    match List.rev (L.P.trim p) with
+    match List.rev (L.P.normalize p) with
     | [] -> Integral.Elementary A.zero
     | [p0] -> Integral.map lift (I.integrate p0)
     | p_n :: _ ->

@@ -18,7 +18,7 @@ let divisors (n: Integer.t): Integer.t list =
 (* 有理数の根：候補 p/q（pは定数項の約数、qは最高次の係数の正の約数）を
    代入して確かめる *)
 let rec solve_equation (p: t): Rational.t list =
-  match to_integer_poly (trim p) with
+  match to_integer_poly (normalize p) with
   | [] | [_] -> []
   | a0 :: _ when Integer.equal a0 Integer.zero ->
     let x = [Rational.zero; Rational.one] in

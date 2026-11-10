@@ -49,7 +49,7 @@ module Make: FUNCTOR_TYPE = functor (D: DERIVATIVE) -> struct
   type constant = F.constant
 
   (* 埋め込み：θの多項式・1つ下の体の元・定数を、分母1の分数とみなす *)
-  let of_poly (p: P.t): t = (P.trim p, P.one)
+  let of_poly (p: P.t): t = (P.normalize p, P.one)
   let of_base (k: F.t): t = of_poly [k]
   let of_constant (c: constant): t = of_base (F.of_constant c)
   (* 添加した元θ（θの多項式 0 + 1θ） *)
@@ -62,8 +62,8 @@ module Make: FUNCTOR_TYPE = functor (D: DERIVATIVE) -> struct
 
   (* θの多項式とみなす。分母がθを含むなら扱わない *)
   let to_poly ((n, d): t): P.t =
-    match P.trim d with
-    | [d0] -> P.div_scalar d0 (P.trim n)
+    match P.normalize d with
+    | [d0] -> P.div_scalar d0 (P.normalize n)
     | _ -> failwith "Tower.to_poly: theta appears in the denominator"
 
   (* Fの元とみなす。θを含むなら扱わない *)
