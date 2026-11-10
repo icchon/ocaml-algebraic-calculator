@@ -1,21 +1,12 @@
 
 module type S = sig
   type coeff
-  type t = coeff list
-  val equal: t -> t -> bool
-  val zero: t
-  val one: t
-  val add: t -> t -> t
-  val neg: t -> t
-  val sub: t -> t -> t
-  val mul: t -> t -> t
-  val pow: int -> t -> t
+  include Ring.S with type t = coeff list
   val div_rem: t -> t -> t * t
   val canonical: t -> t
   val gcd: t -> t -> t
   val ext_gcd: t -> t -> t * t * t
   val trim: t -> t
-  val normalize: t -> t
   val degree: t -> int
   val leading_coeff: t -> coeff
   val eval: t -> coeff -> coeff
