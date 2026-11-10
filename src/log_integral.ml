@@ -11,7 +11,8 @@ struct
   module A = Liouville.Make(L)
 
   (* 整数をFの元として埋め込む *)
-  let rec of_integer (n: int): I.F.t = if n = 0 then I.F.zero else I.F.add I.F.one (of_integer (n - 1))
+  let rec of_integer (n: int): I.F.t =
+    if n <= 0 then I.F.zero else I.F.add I.F.one (of_integer (n - 1))
 
   (* Fでの答えを F(θ) へ持ち上げる。c log u は c θ にまとめる *)
   let lift (b: I.A.t): A.t =
@@ -25,7 +26,7 @@ struct
   let split (b: I.A.t): I.F.t * I.F.t =
     List.fold_left (fun (s, c) (c', w) ->
       if I.F.equal w L.argument then (s, I.F.add c (I.F.of_constant c'))
-      else failwith "Log_integral.integrate: a new logarithm appears in a coefficient")
+      else failwith "Log_integral.integrate: a new logarithm appears")
       (b.v, I.F.zero) b.logs
 
   (* 最高次の項から部分積分する。∫p_n = s + c θ のとき、
@@ -41,7 +42,8 @@ struct
       | Integral.Elementary b ->
         let n = L.P.degree p in
         let (s, c) = split b in
-        let top = List.init n (fun _ -> I.F.zero) @ [s; I.F.div c (of_integer (n + 1))] in
+        let c' = I.F.div c (of_integer (n + 1)) in
+        let top = List.init n (fun _ -> I.F.zero) @ [s; c'] in
         Integral.map (A.add (A.of_field (L.of_poly top)))
           (integrate_poly (L.P.sub p (L.P.differentiate top)))
 

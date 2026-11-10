@@ -11,7 +11,8 @@ struct
   module A = Liouville.Make(E)
 
   (* 整数をFの元として埋め込む *)
-  let rec of_integer (n: int): I.F.t = if n = 0 then I.F.zero else I.F.add I.F.one (of_integer (n - 1))
+  let rec of_integer (n: int): I.F.t =
+    if n <= 0 then I.F.zero else I.F.add I.F.one (of_integer (n - 1))
 
   (* Fでの答えを F(θ) へ持ち上げる *)
   let lift (b: I.A.t): A.t =
@@ -26,8 +27,8 @@ struct
     | p0 :: rest ->
       let u' = I.F.differentiate E.argument in
       let ys =
-        List.mapi
-          (fun i p_i -> I.solve_rde (I.F.mul (of_integer (i + 1)) u') p_i) rest
+        List.mapi (fun i p_i ->
+          I.solve_rde (I.F.mul (of_integer (i + 1)) u') p_i) rest
       in
       if List.mem None ys then Integral.Not_elementary
       else

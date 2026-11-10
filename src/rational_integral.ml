@@ -12,7 +12,8 @@ let linear (a: Constant.t): P.t = [Constant.neg a; Constant.one]
 (* i次の係数と、c x^i を表す多項式 *)
 let coeff (p: P.t) (i: int): Constant.t =
   Option.value (List.nth_opt p i) ~default:Constant.zero
-let monomial (c: Constant.t) (i: int): P.t = List.init i (fun _ -> Constant.zero) @ [c]
+let monomial (c: Constant.t) (i: int): P.t =
+  List.init i (fun _ -> Constant.zero) @ [c]
 
 (* 多項式部分の積分 *)
 let integrate_poly (s: P.t): P.t =
@@ -22,14 +23,14 @@ let integrate_poly (s: P.t): P.t =
 let to_rational ((re, im): Constant.t): Rational.t =
   match Q_sqrt.to_rational re, Q_sqrt.equal im Q_sqrt.zero with
   | Some q, true -> q
-  | _ -> failwith "Rational_integral.integrate: denominator has a non-rational coefficient"
+  | _ -> failwith "Rational_integral.integrate: non-rational coefficient"
 
 (* 分母qの根と多重度。qが有理数の上で2次以下の因数に分解できる場合に限る *)
 let roots_of (q: P.t): (Constant.t * int) list =
   match Q_poly_roots.roots (List.map to_rational (P.normalize q)) with
   | Some rs -> rs
   | None ->
-    failwith "Rational_integral.integrate: the denominator has an irreducible factor of degree >= 3"
+    failwith "Rational_integral.integrate: irreducible factor of degree >= 3"
 
 (* 多重度mの根aの寄与。q = (x-a)^m h のとき、c_k/(x-a)^k の係数は
    c_(m-j) = g^(j)(a)/j!（g = r/h）。k = 1 は対数、k >= 2 は有理関数になる *)
@@ -40,15 +41,16 @@ let root_term (r: P.t) (q: P.t) (a: Constant.t) (m: int): A.t =
   let term (k: int) (c: Constant.t): A.t =
     if k = 1 then A.log c (F.of_poly lin)
     else
-      A.of_field (F.div (F.of_base (Constant.div (Constant.neg c) (const (k - 1))))
-                    (F.of_poly (P.pow (k - 1) lin)))
+      let c' = Constant.div (Constant.neg c) (const (k - 1)) in
+      A.of_field (F.div (F.of_base c') (F.of_poly (P.pow (k - 1) lin)))
   in
   (* g^(j)/j! を順に求め、k = m - j の項を足していく *)
   let rec go (j: int) (g: F.t) (fact: int) (acc: A.t): A.t =
     if j = m then acc
     else
       let c = Constant.div (at g) (const fact) in
-      go (j + 1) (F.differentiate g) (fact * (j + 1)) (A.add acc (term (m - j) c))
+      go (j + 1) (F.differentiate g) (fact * (j + 1))
+        (A.add acc (term (m - j) c))
   in
   go 0 (F.div (F.of_poly r) (F.of_poly h)) 1 A.zero
 

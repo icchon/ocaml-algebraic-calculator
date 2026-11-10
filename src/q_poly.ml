@@ -4,7 +4,8 @@ include Polynomial.Make(Rational)
 let to_integer_poly (p: t): Integer.t list =
   let d =
     List.fold_left (fun acc (_, den) -> Integer.lcm acc den) Integer.one p in
-  List.map (fun (num, den) -> Integer.div_rem (Integer.mul num d) den |> fst) p
+  List.map
+    (fun (num, den) -> Integer.div_rem (Integer.mul num d) den |> fst) p
 
 (* 約数（正と負） *)
 let divisors (n: Integer.t): Integer.t list =
@@ -20,7 +21,8 @@ let rec solve_equation (p: t): Rational.t list =
   match to_integer_poly (trim p) with
   | [] | [_] -> []
   | a0 :: _ when Integer.equal a0 Integer.zero ->
-    Rational.zero :: solve_equation (div_rem p [Rational.zero; Rational.one] |> fst)
+    let x = [Rational.zero; Rational.one] in
+    Rational.zero :: solve_equation (div_rem p x |> fst)
   | a0 :: _ as ints ->
     let an = List.hd (List.rev ints) in
     List.filter (fun q -> Integer.compare q Integer.zero > 0) (divisors an)

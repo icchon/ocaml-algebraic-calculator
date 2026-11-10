@@ -1,11 +1,12 @@
 (* 有理数係数の多項式の根と多重度を、定数の体（√pとiを含む体）の中に求める。
    有理数の根を探し、残りから2次の因数を探して、2次方程式の解の公式で解く。
-   有理数の上で3次以上の既約な因数が残れば、根は定数の体に入らないのでNone *)
+   3次以上の既約な因数が残れば、根が定数の体に入るかは調べずにNone *)
 
 let linear (r: Rational.t): Q_poly.t = [Rational.neg r; Rational.one]
 
-(* 2次の因数を探す（クロネッカーの方法）。g(0), g(1), g(-1) の候補 c, s, t から
-   g = a x^2 + b x + c（2a = s + t - 2c、2b = s - t）を決め、割り切れるものを探す *)
+(* 2次の因数を探す（クロネッカーの方法）。g(0), g(1), g(-1) の候補 c, s, t
+   から g = a x^2 + b x + c（2a = s + t - 2c、2b = s - t）を決め、
+   割り切れるものを探す *)
 let quadratic_factor (p: Q_poly.t): Q_poly.t option =
   let p = List.map Rational.of_integer (Q_poly.to_integer_poly p) in
   let ds (x: Integer.t): Integer.t list =
@@ -18,7 +19,8 @@ let quadratic_factor (p: Q_poly.t): Q_poly.t option =
   List.concat_map (fun c ->
     List.concat_map (fun s -> List.filter_map (make c s) (ds (-1))) (ds 1))
     (ds 0)
-  |> List.find_opt (fun g -> Q_poly.equal (snd (Q_poly.div_rem p g)) Q_poly.zero)
+  |> List.find_opt (fun g ->
+       Q_poly.equal (snd (Q_poly.div_rem p g)) Q_poly.zero)
 
 exception Irreducible
 

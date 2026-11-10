@@ -10,7 +10,8 @@ end
 module type S = sig
   module F: Differential.S
   module P: POLY with type coeff = F.t (* F[θ] *)
-  include Differential.S with type t = P.t * P.t and type constant = F.constant
+  include Differential.S with type t = P.t * P.t
+                          and type constant = F.constant
   val theta: t
   val of_base: F.t -> t
   val of_poly: P.t -> t
@@ -82,7 +83,7 @@ module Make: FUNCTOR_TYPE = functor (D: DERIVATIVE) -> struct
     | _ -> failwith "Tower.to_base: the element contains theta"
 end
 
-(* log u や e^u のように、Fの元uから作る段（初等的な拡大）。uを覚えておく *)
+(* log u や e^u のように、Fの元uからつくる段。uを覚えておく *)
 module type ELEMENTARY = sig
   include S
   val argument: F.t (* u *)
