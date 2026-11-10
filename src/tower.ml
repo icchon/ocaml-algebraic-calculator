@@ -44,15 +44,6 @@ module Make: FUNCTOR_TYPE = functor (D: DERIVATIVE) -> struct
          (c0' + c1' θ + ...) + (c1 + 2 c2 θ + ...) θ' *)
     let differentiate (p: t): t =
       add (List.map F.differentiate p) (mul (power_rule p) D.derivative)
-    (* 全順序 *)
-    let rec compare (x1: t) (x2: t): int =
-      match x1, x2 with
-      | [], [] -> 0
-      | [], _ -> -1
-      | _, [] -> 1
-      | c1 :: r1, c2 :: r2 ->
-        let c = F.compare c1 c2 in
-        if c <> 0 then c else compare r1 r2
   end
   include Fraction.Make(P)
   type constant = F.constant

@@ -88,13 +88,6 @@ let of_rational_sqrt (q: Coeff.t): t =
     let (s, primes) = split_square (Integer.mul n d) in
     normalize [(primes, Coeff.div (Coeff.of_integer s) (Coeff.of_integer d))]
 
-(* 全順序 *)
-let compare (x1: t) (x2: t): int =
-  List.compare (fun (s1, c1) (s2, c2) ->
-    let o = compare_basis s1 s2 in
-    if o <> 0 then o else Coeff.compare c1 c2
-  ) x1 x2
-
 (* 登場する素数全体 *)
 let collect_primes (v: t): basis =
   List.sort_uniq Integer.compare (List.concat_map fst v)

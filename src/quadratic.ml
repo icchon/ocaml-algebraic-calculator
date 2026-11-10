@@ -1,10 +1,5 @@
 include Complexical.Make(Q_sqrt)
 
-(* 全順序 *)
-let compare ((a1, b1): t) ((a2, b2): t): int =
-  let c = Q_sqrt.compare a1 a2 in
-  if c <> 0 then c else Q_sqrt.compare b1 b2
-
 (* 有理数の埋め込み *)
 let of_rational (q: Rational.t): t =
   (Q_sqrt.of_rational q, Q_sqrt.zero)
